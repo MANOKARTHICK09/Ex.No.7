@@ -1,70 +1,192 @@
 # Exno.7-Develop a prompt-based application tailored to their personal needs, fostering creativity and practical problem-solving skills while leveraging the capabilities of large language models.
 
-# Date: 16-09-2025
-# Register no: 212223060101
-# Aim: 
-To develop a prompt-based application using ChatGPT - To demonstrate how to create a prompt-based application to organize daily tasks, showing the progression from simple to more advanced prompt designs and their corresponding outputs.
+# Aim: To develop a prompt-based application using ChatGPT - To demonstrate how to create a prompt-based application to organize daily tasks, showing the progression from simple to more advanced prompt designs and their corresponding outputs.
 
 # AI Tools Required: 
-Claude
+ChatGPT (GPT-5) or any comparable Large Language Model (LLM)
+
+Optional: Python (for a simple CLI or web interface)
+
+Optional: Browser or mobile interface for testing
+
 # Explanation: 
-## Prompt 
-Some tasks got canceled—reorganize my remaining schedule to maximize productivity and rest, and suggest new priorities if possible. Here’s my agenda:
-- 8:00 AM – Team stand-up meeting
-- 9:00 AM – Deep work: finish project report
-- 11:00 AM – Client call (canceled)
-- 12:30 PM – Lunch break
-- 1:30 PM – Review emails & respond to pending messages
-- 2:30 PM – Doctor’s appointment (canceled)
-- 4:00 PM – Work on presentation slides
-- 6:00 PM – Gym session
-- 8:00 PM – Family dinner
-- 9:30 PM – Personal reading or skill learning
+Prompt:
+"Design a personal productivity assistant that can help manage daily tasks, schedule reminders, suggest wellness tips, and answer general queries. The assistant should interact using natural language and be adaptable to the user’s changing preferences over time."
+Procedure:
+1. Define the core requirements of a personal productivity assistant.
+2. Identify and construct appropriate prompts for each task using an LLM (e.g., ChatGPT).
+3. Simulate natural user interaction through a simple interface or command-line system.
+4. Collect feedback or inputs from users and adapt responses accordingly.
+5. (Optional) Integrate basic memory to simulate preference adaptation.
+EXPECTED OUTPUT: - (attached the drive link)
+Output (Example Response by LLM):
+Personal Productivity Assistant Features:
+1. Daily Task Manager:
+o Accept tasks via natural language (e.g., "Remind me to call mom at 6 PM").
+o Organize tasks by priority and deadline.
+o Provide daily summaries and pending items.
+2. Smart Scheduler:
+o Schedule events and set reminders using contextual understanding.
+o Notify user of overlapping appointments or free time slots.
+3. Wellness Tips Generator:
+o Suggest daily wellness advice (hydration, exercise, screen-time breaks).
+o Adapt suggestions based on past user preferences and responses.
 
-## Claude's response
+# Features Implemented
 
-### Morning Block (Enhanced Focus Time)
+Daily Task Manager – add, list, and mark tasks complete.
 
-8:00 AM – Team stand-up meeting
+Smart Scheduler / Reminders – stores due-times and checks what is due soon.
 
-9:00 AM – Deep work: finish project report (extended time available)
+Wellness Tips – random, easy tips; adapts slightly based on your stored preferences.
 
-11:00 AM – Buffer time for report completion or early lunch prep
+General Q&A (mocked) – simple keyword-based answers to simulate LLM help.
 
-12:30 PM – Lunch break
+# Python Code
 
-### Afternoon Block (Productive Flow)
+import datetime
+import time
+import random
+from collections import defaultdict
 
-1:30 PM – Review emails & respond to pending messages
+# ---------- Mock "LLM" Response ----------
+def mock_llm_response(prompt: str) -> str:
+    """Simulate a language model reply."""
+    if "weather" in prompt.lower():
+        return "Today's weather looks pleasant with mild temperatures."
+    elif "quote" in prompt.lower():
+        return random.choice([
+            "“The best way to get started is to quit talking and begin doing.” – Walt Disney",
+            "“Don’t watch the clock; do what it does. Keep going.” – Sam Levenson"
+        ])
+    else:
+        return "I'm your assistant and can help with tasks, reminders, or wellness tips!"
 
-2:30 PM – Power hour: Work on presentation slides (moved earlier for better energy)
+# ---------- Core Assistant ----------
+class PersonalAssistant:
+    def __init__(self):
+        self.tasks = {}                   # task_id -> (task, deadline, done)
+        self.next_id = 1
+        self.user_prefs = defaultdict(int) # simple memory for wellness likes
 
-3:30 PM – Strategic break/walk (mental reset)
+    def add_task(self, description, deadline=None):
+        self.tasks[self.next_id] = [description, deadline, False]
+        print(f"Task #{self.next_id} added.")
+        self.next_id += 1
 
-4:00 PM – Presentation refinement or catch-up tasks
+    def list_tasks(self):
+        if not self.tasks:
+            print("No tasks yet.")
+            return
+        print("\nYour Tasks:")
+        for tid, (desc, deadline, done) in self.tasks.items():
+            status = "✓" if done else "✗"
+            dline = f" (due {deadline})" if deadline else ""
+            print(f"[{status}] {tid}: {desc}{dline}")
 
-5:00 PM – End work early (mental transition time)
+    def mark_done(self, tid):
+        if tid in self.tasks:
+            self.tasks[tid][2] = True
+            print(f"Task #{tid} marked complete.")
+        else:
+            print("Invalid task ID.")
 
-### Evening Block (Personal Time)
+    def check_reminders(self):
+        now = datetime.datetime.now()
+        for tid, (desc, deadline, done) in self.tasks.items():
+            if deadline and not done:
+                if now >= deadline - datetime.timedelta(minutes=1):
+                    print(f"Reminder: Task #{tid} '{desc}' is due at {deadline}!")
 
-6:00 PM – Gym session
+    def wellness_tip(self):
+        tips = [
+            "Drink a glass of water.",
+            "Take a 5-minute stretch break.",
+            "Practice deep breathing for one minute.",
+            "Walk for 10 minutes if possible."
+        ]
+        # basic preference adaptation
+        preferred = max(self.user_prefs, key=self.user_prefs.get, default=None)
+        if preferred:
+            tips.append(f"Repeat your favorite: {preferred}")
+        tip = random.choice(tips)
+        self.user_prefs[tip] += 1
+        print("Wellness Tip:", tip)
 
-8:00 PM – Family dinner
+    def general_query(self, question):
+        print(mock_llm_response(question))
 
-9:30 PM – Personal reading or skill learning
+# ---------- Simple CLI ----------
+def main():
+    assistant = PersonalAssistant()
+    print("=== Personal Productivity Assistant ===")
+    print("Commands: add, list, done, tip, ask, check, quit")
 
-### Key Improvements:
+    while True:
+        cmd = input("\n> ").strip().lower()
 
-* Extended deep work window - You now have uninterrupted focus time from 9-11 AM
-* Earlier presentation work - Moved to 2:30 PM when your energy is still high
-* Built-in buffer time - Flexibility for tasks that run over
-* Earlier work cutoff - Ends by 5 PM, giving you transition time before gym
+        if cmd == "add":
+            desc = input("Task description: ")
+            dline = input("Deadline (YYYY-MM-DD HH:MM or blank): ")
+            deadline = None
+            if dline:
+                try:
+                    deadline = datetime.datetime.strptime(dline, "%Y-%m-%d %H:%M")
+                except ValueError:
+                    print("Invalid format, skipping deadline.")
+            assistant.add_task(desc, deadline)
 
-### New Priority Suggestions:
+        elif cmd == "list":
+            assistant.list_tasks()
 
-* Use the 3:30-4:00 PM break for a brief walk or mindfulness practice
-* Consider batch-processing emails instead of spreading throughout day
-* The 11:00 AM slot could become a weekly planning/reflection time
+        elif cmd == "done":
+            tid = int(input("Task ID to mark complete: "))
+            assistant.mark_done(tid)
+
+        elif cmd == "tip":
+            assistant.wellness_tip()
+
+        elif cmd == "ask":
+            q = input("Ask a question: ")
+            assistant.general_query(q)
+
+        elif cmd == "check":
+            assistant.check_reminders()
+
+        elif cmd == "quit":
+            print("Goodbye!")
+            break
+        else:
+            print("Unknown command. Try again.")
+
+if __name__ == "__main__":
+    main()
+How It Demonstrates the Procedure
+
+Define requirements – tasks, scheduler, wellness, Q&A.
+
+Prompt construction – the mock mock_llm_response simulates an LLM answering natural questions.
+
+Natural interaction – CLI accepts commands in everyday language.
+
+Feedback & adaptation – tracks which wellness tips you pick most and surfaces them more often.
+
+Optional memory – preferences stored in self.user_prefs during the session.
+
+# Running & Extending
+
+Run in a terminal: python assistant_app.py
+
+Use commands like:
+
+add → “Remind me to call mom” with a deadline.
+
+tip → get wellness advice.
+
+ask → “Give me a motivational quote.”
+
+To connect to real LLMs, replace mock_llm_response() with an actual API call (e.g., OpenAI’s openai.ChatCompletion.create()).
+
 
 # Result: 
 The lab exercise resulted in the creation of a prototype concept for a personal assistant powered by large language models. Students were able to:
